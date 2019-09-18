@@ -884,14 +884,17 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      *
      * @return {@code true} if this task is now cancelled
      */
+    @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         return (setCompletion(CANCELLED) & DONE_MASK) == CANCELLED;
     }
 
+    @Override
     public final boolean isDone() {
         return status < 0;
     }
 
+    @Override
     public final boolean isCancelled() {
         return (status & DONE_MASK) == CANCELLED;
     }

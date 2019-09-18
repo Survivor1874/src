@@ -144,6 +144,7 @@ public interface DocumentationTool extends Tool, OptionChecker {
          *
          * @throws IllegalStateException if called more than once
          */
+        @Override
         Boolean call();
     }
 

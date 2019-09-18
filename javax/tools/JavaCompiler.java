@@ -330,6 +330,7 @@ public interface JavaCompiler extends Tool, OptionChecker {
          * in user code.
          * @throws IllegalStateException if called more than once
          */
+        @Override
         Boolean call();
     }
 }

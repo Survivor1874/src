@@ -135,12 +135,13 @@ final class SortedOps {
 
             // If the input is already naturally sorted and this operation
             // also naturally sorted then this is a no-op
-            if (StreamOpFlag.SORTED.isKnown(flags) && isNaturalSort)
+            if (StreamOpFlag.SORTED.isKnown(flags) && isNaturalSort) {
                 return sink;
-            else if (StreamOpFlag.SIZED.isKnown(flags))
+            } else if (StreamOpFlag.SIZED.isKnown(flags)) {
                 return new SizedRefSortingSink<>(sink, comparator);
-            else
+            } else {
                 return new RefSortingSink<>(sink, comparator);
+            }
         }
 
         @Override
@@ -338,8 +339,9 @@ final class SortedOps {
         @Override
         @SuppressWarnings("unchecked")
         public void begin(long size) {
-            if (size >= Nodes.MAX_ARRAY_SIZE)
+            if (size >= Nodes.MAX_ARRAY_SIZE) {
                 throw new IllegalArgumentException(Nodes.BAD_SIZE);
+            }
             array = (T[]) new Object[(int) size];
         }
 
@@ -369,6 +371,7 @@ final class SortedOps {
      * {@link Sink} for implementing sort on reference streams.
      */
     private static final class RefSortingSink<T> extends AbstractRefSortingSink<T> {
+
         private ArrayList<T> list;
 
         RefSortingSink(Sink<? super T> sink, Comparator<? super T> comparator) {
@@ -377,21 +380,25 @@ final class SortedOps {
 
         @Override
         public void begin(long size) {
-            if (size >= Nodes.MAX_ARRAY_SIZE)
+            if (size >= Nodes.MAX_ARRAY_SIZE) {
                 throw new IllegalArgumentException(Nodes.BAD_SIZE);
-            list = (size >= 0) ? new ArrayList<T>((int) size) : new ArrayList<T>();
+            }
+            list = (size >= 0) ? new ArrayList<>((int) size) : new ArrayList<>();
         }
 
         @Override
         public void end() {
             list.sort(comparator);
+
             downstream.begin(list.size());
+
             if (!cancellationWasRequested) {
                 list.forEach(downstream::accept);
-            }
-            else {
+            } else {
                 for (T t : list) {
-                    if (downstream.cancellationRequested()) break;
+                    if (downstream.cancellationRequested()) {
+                        break;
+                    }
                     downstream.accept(t);
                 }
             }
@@ -435,8 +442,9 @@ final class SortedOps {
 
         @Override
         public void begin(long size) {
-            if (size >= Nodes.MAX_ARRAY_SIZE)
+            if (size >= Nodes.MAX_ARRAY_SIZE) {
                 throw new IllegalArgumentException(Nodes.BAD_SIZE);
+            }
             array = new int[(int) size];
         }
 

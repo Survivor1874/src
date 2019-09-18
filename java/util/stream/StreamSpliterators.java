@@ -356,8 +356,9 @@ class StreamSpliterators {
         public boolean tryAdvance(IntConsumer consumer) {
             Objects.requireNonNull(consumer);
             boolean hasNext = doAdvance();
-            if (hasNext)
+            if (hasNext) {
                 consumer.accept(buffer.get(nextToConsume));
+            }
             return hasNext;
         }
 

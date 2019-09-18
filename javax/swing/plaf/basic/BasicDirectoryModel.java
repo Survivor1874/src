@@ -273,6 +273,7 @@ public class BasicDirectoryModel extends AbstractListModel<Object> implements Pr
             // To avoid loads of synchronizations with Invoker and improve performance we
             // execute the whole block on the COM thread
             DoChangeContents doChangeContents = ShellFolder.invoke(new Callable<DoChangeContents>() {
+                @Override
                 public DoChangeContents call() {
                     int newSize = newFileCache.size();
                     int oldSize = fileCache.size();

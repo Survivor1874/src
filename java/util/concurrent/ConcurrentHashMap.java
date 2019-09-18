@@ -548,7 +548,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * than 2, and should be at least 8 to mesh with assumptions in
      * tree removal about conversion back to plain bins upon
      * shrinkage.
-     *
+     * <p>
      * 链表长度大于该值树化
      */
     static final int TREEIFY_THRESHOLD = 8;
@@ -1039,6 +1039,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * {@code null} if there was no mapping for {@code key}
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public V put(K key, V value) {
         return putVal(key, value, false);
     }
@@ -1047,21 +1048,24 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * Implementation for put and putIfAbsent
      */
     final V putVal(K key, V value, boolean onlyIfAbsent) {
-        if (key == null || value == null) throw new NullPointerException();
+        if (key == null || value == null) {
+            throw new NullPointerException();
+        }
         int hash = spread(key.hashCode());
         int binCount = 0;
         for (Node<K, V>[] tab = table; ; ) {
             Node<K, V> f;
             int n, i, fh;
-            if (tab == null || (n = tab.length) == 0)
+            if (tab == null || (n = tab.length) == 0) {
                 tab = initTable();
-            else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            } else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
                 if (casTabAt(tab, i, null,
-                        new Node<K, V>(hash, key, value, null)))
+                        new Node<K, V>(hash, key, value, null))) {
                     break;                   // no lock when adding to empty bin
-            } else if ((fh = f.hash) == MOVED)
+                }
+            } else if ((fh = f.hash) == MOVED) {
                 tab = helpTransfer(tab, f);
-            else {
+            } else {
                 V oldVal = null;
                 synchronized (f) {
                     if (tabAt(tab, i) == f) {
@@ -2141,7 +2145,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      */
     public long mappingCount() {
         long n = sumCount();
-        return (n < 0L) ? 0L : n; // ignore transient negative values
+        // ignore transient negative values
+        return (n < 0L) ? 0L : n;
     }
 
     /**
@@ -2296,21 +2301,21 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     private final void addCount(long x, int check) {
         CounterCell[] as;
         long b, s;
-        if ((as = counterCells) != null ||
-                !U.compareAndSwapLong(this, BASECOUNT, b = baseCount, s = b + x)) {
+        if ((as = counterCells) != null || !U.compareAndSwapLong(this, BASECOUNT, b = baseCount, s = b + x)) {
             CounterCell a;
             long v;
             int m;
             boolean uncontended = true;
-            if (as == null || (m = as.length - 1) < 0 ||
-                    (a = as[ThreadLocalRandom.getProbe() & m]) == null ||
-                    !(uncontended =
-                            U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x))) {
+            if (as == null
+                    || (m = as.length - 1) < 0
+                    || (a = as[ThreadLocalRandom.getProbe() & m]) == null
+                    || !(uncontended = U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x))) {
                 fullAddCount(x, uncontended);
                 return;
             }
-            if (check <= 1)
+            if (check <= 1) {
                 return;
+            }
             s = sumCount();
         }
         if (check >= 0) {
@@ -2322,13 +2327,16 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 if (sc < 0) {
                     if ((sc >>> RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
                             sc == rs + MAX_RESIZERS || (nt = nextTable) == null ||
-                            transferIndex <= 0)
+                            transferIndex <= 0) {
                         break;
-                    if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
+                    }
+                    if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1)) {
                         transfer(tab, nt);
+                    }
                 } else if (U.compareAndSwapInt(this, SIZECTL, sc,
-                        (rs << RESIZE_STAMP_SHIFT) + 2))
+                        (rs << RESIZE_STAMP_SHIFT) + 2)) {
                     transfer(tab, null);
+                }
                 s = sumCount();
             }
         }
@@ -2559,8 +2567,9 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         long sum = baseCount;
         if (as != null) {
             for (int i = 0; i < as.length; ++i) {
-                if ((a = as[i]) != null)
+                if ((a = as[i]) != null) {
                     sum += a.value;
+                }
             }
         }
         return sum;
@@ -2599,24 +2608,29 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                             } finally {
                                 cellsBusy = 0;
                             }
-                            if (created)
+                            if (created) {
                                 break;
+                            }
                             continue;           // Slot is now non-empty
                         }
                     }
                     collide = false;
-                } else if (!wasUncontended)       // CAS already known to fail
-                    wasUncontended = true;      // Continue after rehash
-                else if (U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x))
+                    // CAS already known to fail
+                } else if (!wasUncontended) {
+                    wasUncontended = true;
+                    // Continue after rehash
+                } else if (U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x)) {
                     break;
-                else if (counterCells != as || n >= NCPU)
-                    collide = false;            // At max size or stale
-                else if (!collide)
+                } else if (counterCells != as || n >= NCPU) {
+                    // At max size or stale
+                    collide = false;
+                } else if (!collide) {
                     collide = true;
-                else if (cellsBusy == 0 &&
+                } else if (cellsBusy == 0 &&
                         U.compareAndSwapInt(this, CELLSBUSY, 0, 1)) {
                     try {
-                        if (counterCells == as) {// Expand table unless stale
+                        if (counterCells == as) {
+                            // Expand table unless stale
                             CounterCell[] rs = new CounterCell[n << 1];
                             for (int i = 0; i < n; ++i)
                                 rs[i] = as[i];
@@ -2642,10 +2656,12 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 } finally {
                     cellsBusy = 0;
                 }
-                if (init)
+                if (init) {
                     break;
-            } else if (U.compareAndSwapLong(this, BASECOUNT, v = baseCount, v + x))
+                }
+            } else if (U.compareAndSwapLong(this, BASECOUNT, v = baseCount, v + x)) {
                 break;                          // Fall back on using base
+            }
         }
     }
 

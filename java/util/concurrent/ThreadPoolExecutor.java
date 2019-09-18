@@ -1048,15 +1048,13 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                 int workCount = workerCountOf(countAndState);
 
                 // 如果 线程数大于最大容量或者大于核心线程数， 返回 false
-                // 判断条件有点难理解，其实是非运行状态下（>=SHUTDOWN）或者SHUTDOWN状态下任务非空(新提交任务)、任务队列为空，
-                // 就不可以再新增线程了（return false）,即SHUTDOWN状态是可以新增线程去执行队列中的任务；
                 if (workCount >= CAPACITY
                         || workCount >= (core ? corePoolSize : maximumPoolSize)) {
                     return false;
                 }
                 // 原子操作递增workCount
                 if (compareAndIncrementWorkerCount(countAndState)) {
-                    // 操作成功跳出的重试的循环
+                    // 操作成功跳出循环
                     break retry;
                 }
                 // Re-read ctl
@@ -1075,6 +1073,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         boolean workerAdded = false;
         Worker newWorker = null;
         try {
+            // 这里将 state 置为了 -1
             newWorker = new Worker(paramTask);
             final Thread paramThread = newWorker.thread;
             if (paramThread != null) {
@@ -1082,8 +1081,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                 mainLock.lock();
                 try {
                     // Recheck while holding lock.
-                    // Back out on ThreadFactory failure or if
-                    // shut down before lock acquired.
+                    // Back out on ThreadFactory failure or if shut down before lock acquired.
                     int runState = runStateOf(ctl.get());
 
                     // RUNNING状态 || SHUTDONW状态下清理队列中剩余的任务
@@ -1130,12 +1128,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * - rechecks for termination, in case the existence of this
      * worker was holding up termination
      */
-    private void addWorkerFailed(Worker w) {
+    private void addWorkerFailed(Worker woker) {
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
         try {
-            if (w != null) {
-                workers.remove(w);
+            if (woker != null) {
+                workers.remove(woker);
             }
             decrementWorkerCount();
             tryTerminate();
@@ -1505,18 +1503,23 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                               BlockingQueue<Runnable> workQueue,
                               ThreadFactory threadFactory,
                               RejectedExecutionHandler handler) {
-        if (corePoolSize < 0 ||
-                maximumPoolSize <= 0 ||
-                maximumPoolSize < corePoolSize ||
-                keepAliveTime < 0) {
+
+        // 参数校验
+        if (corePoolSize < 0
+                || maximumPoolSize <= 0
+                || maximumPoolSize < corePoolSize
+                || keepAliveTime < 0) {
             throw new IllegalArgumentException();
         }
+
         if (workQueue == null || threadFactory == null || handler == null) {
             throw new NullPointerException();
         }
-        this.acc = System.getSecurityManager() == null ?
-                null :
-                AccessController.getContext();
+
+        this.acc = System.getSecurityManager() == null
+                ? null
+                : AccessController.getContext();
+
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
         this.workQueue = workQueue;
@@ -1573,22 +1576,25 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             if (addWorker(command, true)) {
                 return;
             }
+
+            // 添加线程失败 再次获取 ctl
             stateAndCount = ctl.get();
         }
 
-        // 活动线程数 >= corePoolSize
+        // 活动线程数 >= corePoolSize 或者添加 worker 失败
         // runState为RUNNING && 队列未满
         if (isRunning(stateAndCount) && workQueue.offer(command)) {
             int recheck = ctl.get();
 
 
             if (!isRunning(recheck) && remove(command)) {
-                // 非RUNNING状态 则从workQueue中移除任务并拒绝
+                // 线程池非 RUNNING 状态 从 workQueue 中移除任务成功
+                // 拒绝任务 执行拒绝策略
                 reject(command);
             } else if (workerCountOf(recheck) == 0) {
-                // 线程池处于RUNNING状态 || 线程池处于非RUNNING状态但是任务移除失败
-                // 这行代码是为了SHUTDOWN状态下没有活动线程了，但是队列里还有任务没执行这种特殊情况。
-                // 添加一个null任务是因为SHUTDOWN状态下，线程池不再接受新任务
+                // 线程池处于 RUNNING 状态 || 线程池处于非RUNNING状态但是任务移除失败 并且活动线程数是 0
+                // 这行代码是为了 SHUTDOWN 状态下没有活动线程了，但是队列里还有任务没执行这种特殊情况。
+                // 添加一个 null 任务是因为 SHUTDOWN 状态下，线程池不再接受新任务
                 addWorker(null, false);
             }
         } else if (!addWorker(command, false)) {
@@ -1828,14 +1834,19 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
+     * 这是父类 ThreadPoolExecutor 的方法用于确保有 worker 线程来执行任务。
      * Same as prestartCoreThread except arranges that at least one
      * thread is started even if corePoolSize is 0.
      */
     void ensurePrestart() {
         int wc = workerCountOf(ctl.get());
         if (wc < corePoolSize) {
+
+            // worker 数目小于 corePoolSize，则添加一个 worker。
             addWorker(null, true);
         } else if (wc == 0) {
+
+            // wc == orePoolSize == 0 的情况也添加一个 worker。
             addWorker(null, false);
         }
     }

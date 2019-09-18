@@ -290,6 +290,7 @@ public abstract class SwingWorker<T, V> implements RunnableFuture<T> {
     public SwingWorker() {
         Callable<T> callable =
                 new Callable<T>() {
+                    @Override
                     public T call() throws Exception {
                         setState(StateValue.STARTED);
                         return doInBackground();
@@ -542,6 +543,7 @@ public abstract class SwingWorker<T, V> implements RunnableFuture<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean cancel(boolean mayInterruptIfRunning) {
         return future.cancel(mayInterruptIfRunning);
     }
@@ -549,6 +551,7 @@ public abstract class SwingWorker<T, V> implements RunnableFuture<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isCancelled() {
         return future.isCancelled();
     }
@@ -556,6 +559,7 @@ public abstract class SwingWorker<T, V> implements RunnableFuture<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isDone() {
         return future.isDone();
     }

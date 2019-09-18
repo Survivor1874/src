@@ -2266,6 +2266,7 @@ public abstract class JTextComponent extends JComponent implements Scrollable, A
          */
         final Callable<Object> doPrint =
             new Callable<Object>() {
+                @Override
                 public Object call() throws Exception {
                     try {
                         job.print(attr);
@@ -2295,6 +2296,7 @@ public abstract class JTextComponent extends JComponent implements Scrollable, A
                         try {
                             wasEnabled = SwingUtilities2.submit(
                                 new Callable<Boolean>() {
+                                    @Override
                                     public Boolean call() throws Exception {
                                         boolean rv = isEnabled();
                                         if (rv) {

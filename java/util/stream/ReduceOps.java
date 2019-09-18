@@ -109,6 +109,7 @@ final class ReduceOps {
             private boolean empty;
             private T state;
 
+            @Override
             public void begin(long size) {
                 empty = true;
                 state = null;
@@ -201,15 +202,17 @@ final class ReduceOps {
      * @param reducer a function to combine an accumulator into another
      * @return a {@code TerminalOp} implementing the reduction
      */
-    public static <T, R> TerminalOp<T, R>
-    makeRef(Supplier<R> seedFactory,
+    public static <T, R> TerminalOp<T, R> makeRef(
+            Supplier<R> seedFactory,
             BiConsumer<R, ? super T> accumulator,
             BiConsumer<R,R> reducer) {
+
         Objects.requireNonNull(seedFactory);
         Objects.requireNonNull(accumulator);
         Objects.requireNonNull(reducer);
-        class ReducingSink extends Box<R>
-                implements AccumulatingSink<T, R, ReducingSink> {
+
+        class ReducingSink extends Box<R> implements AccumulatingSink<T, R, ReducingSink> {
+
             @Override
             public void begin(long size) {
                 state = seedFactory.get();
@@ -225,6 +228,7 @@ final class ReduceOps {
                 reducer.accept(state, other.state);
             }
         }
+
         return new ReduceOp<T, R, ReducingSink>(StreamShape.REFERENCE) {
             @Override
             public ReducingSink makeSink() {
@@ -291,6 +295,7 @@ final class ReduceOps {
             private boolean empty;
             private int state;
 
+            @Override
             public void begin(long size) {
                 empty = true;
                 state = 0;
@@ -427,6 +432,7 @@ final class ReduceOps {
             private boolean empty;
             private long state;
 
+            @Override
             public void begin(long size) {
                 empty = true;
                 state = 0;
@@ -563,6 +569,7 @@ final class ReduceOps {
             private boolean empty;
             private double state;
 
+            @Override
             public void begin(long size) {
                 empty = true;
                 state = 0;

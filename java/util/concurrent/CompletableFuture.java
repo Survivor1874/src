@@ -1876,6 +1876,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
      *
      * @return {@code true} if completed
      */
+    @Override
     public boolean isDone() {
         return result != null;
     }
@@ -2259,6 +2260,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
      *
      * @return {@code true} if this task is now cancelled
      */
+    @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         boolean cancelled = (result == null) &&
             internalComplete(new AltResult(new CancellationException()));
@@ -2273,6 +2275,7 @@ public class CompletableFuture<T> implements Future<T>, CompletionStage<T> {
      * @return {@code true} if this CompletableFuture was cancelled
      * before it completed normally
      */
+    @Override
     public boolean isCancelled() {
         Object r;
         return ((r = result) instanceof AltResult) &&
