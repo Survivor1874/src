@@ -933,6 +933,7 @@ public class ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements S
      *
      * @throws SecurityException {@inheritDoc}
      */
+    @Override
     public void shutdown() {
         super.shutdown();
     }
@@ -958,6 +959,7 @@ public class ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements S
      * zero-delay {@code ScheduledFuture}.
      * @throws SecurityException {@inheritDoc}
      */
+    @Override
     public List<Runnable> shutdownNow() {
         return super.shutdownNow();
     }
@@ -1386,6 +1388,7 @@ public class ScheduledThreadPoolExecutor extends ThreadPoolExecutor implements S
             }
         }
 
+        @Override
         public RunnableScheduledFuture<?> poll(long timeout, TimeUnit unit)
                 throws InterruptedException {
             long nanos = unit.toNanos(timeout);

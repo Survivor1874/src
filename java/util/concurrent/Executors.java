@@ -613,6 +613,7 @@ public class Executors {
                          "-thread-";
         }
 
+        @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r,
                                   namePrefix + threadNumber.getAndIncrement(),
@@ -648,6 +649,7 @@ public class Executors {
             this.ccl = Thread.currentThread().getContextClassLoader();
         }
 
+        @Override
         public Thread newThread(final Runnable r) {
             return super.newThread(new Runnable() {
                 public void run() {

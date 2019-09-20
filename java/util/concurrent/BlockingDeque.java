@@ -466,6 +466,7 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
      * @throws IllegalArgumentException if some property of the specified
      *         element prevents it from being added to this deque
      */
+    @Override
     boolean offer(E e);
 
     /**
@@ -554,6 +555,7 @@ public interface BlockingDeque<E> extends BlockingQueue<E>, Deque<E> {
      *         specified waiting time elapses before an element is available
      * @throws InterruptedException if interrupted while waiting
      */
+    @Override
     E poll(long timeout, TimeUnit unit)
         throws InterruptedException;
 

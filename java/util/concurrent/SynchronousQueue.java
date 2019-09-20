@@ -908,6 +908,7 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      *         {@code false}
      * @throws NullPointerException if the specified element is null
      */
+    @Override
     public boolean offer(E e) {
         if (e == null) throw new NullPointerException();
         return transferer.transfer(e, true, 0) != null;
@@ -937,6 +938,7 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      *         specified waiting time elapses before an element is present
      * @throws InterruptedException {@inheritDoc}
      */
+    @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         E e = transferer.transfer(null, true, unit.toNanos(timeout));
         if (e != null || !Thread.interrupted())

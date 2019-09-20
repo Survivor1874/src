@@ -637,6 +637,7 @@ public class LinkedBlockingDeque<E>
     /**
      * @throws NullPointerException if the specified element is null
      */
+    @Override
     public boolean offer(E e) {
         return offerLast(e);
     }
@@ -680,6 +681,7 @@ public class LinkedBlockingDeque<E>
         return takeFirst();
     }
 
+    @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         return pollFirst(timeout, unit);
     }
