@@ -164,6 +164,7 @@ public class PIHandlerImpl implements PIHandler
     // and a disable count.
     private ThreadLocal threadLocalClientRequestInfoStack =
         new ThreadLocal() {
+            @Override
             protected Object initialValue() {
                 return new RequestInfoStack();
             }
@@ -172,6 +173,7 @@ public class PIHandlerImpl implements PIHandler
     // ThreadLocal containing the current server request info object.
     private ThreadLocal threadLocalServerRequestInfoStack =
         new ThreadLocal() {
+            @Override
             protected Object initialValue() {
                 return new RequestInfoStack();
             }

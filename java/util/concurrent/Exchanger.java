@@ -322,6 +322,7 @@ public class Exchanger<V> {
 
     /** The corresponding thread local class */
     static final class Participant extends ThreadLocal<Node> {
+        @Override
         public Node initialValue() { return new Node(); }
     }
 

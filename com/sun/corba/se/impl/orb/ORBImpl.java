@@ -172,6 +172,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // thread local variable to store a boolean to detect deadlock in
     // ORB.shutdown(true).
     private ThreadLocal isProcessingInvocation = new ThreadLocal () {
+        @Override
         protected java.lang.Object initialValue() {
             return Boolean.FALSE;
         }
@@ -349,6 +350,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         transientServerId = (int)System.currentTimeMillis();
 
         orbVersionThreadLocal  = new ThreadLocal () {
+            @Override
             protected java.lang.Object initialValue() {
                 // set default to version of the ORB with correct Rep-ids
                 return ORBVersionFactory.getORBVersion() ;
@@ -372,6 +374,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         OAInvocationInfoStack =
             new ThreadLocal () {
+                @Override
                 protected java.lang.Object initialValue()
                 {
                     return new StackImpl();
@@ -380,6 +383,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         clientInvocationInfoStack =
             new ThreadLocal() {
+                @Override
                 protected java.lang.Object initialValue() {
                     return new StackImpl();
                 }

@@ -58,6 +58,7 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T> {
      * @param parentValue the parent thread's value
      * @return the child thread's initial value
      */
+    @Override
     protected T childValue(T parentValue) {
         return parentValue;
     }
@@ -67,6 +68,7 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T> {
      *
      * @param t the current thread
      */
+    @Override
     ThreadLocalMap getMap(Thread t) {
        return t.inheritableThreadLocals;
     }
@@ -77,6 +79,7 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T> {
      * @param t the current thread
      * @param firstValue value for the initial entry of the table.
      */
+    @Override
     void createMap(Thread t, T firstValue) {
         t.inheritableThreadLocals = new ThreadLocalMap(this, firstValue);
     }

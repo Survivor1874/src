@@ -363,6 +363,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
             orb.poaConcurrencyDebugFlag ) ;
 
         isDestroying = new ThreadLocal () {
+            @Override
             protected java.lang.Object initialValue() {
                 return Boolean.FALSE;
             }

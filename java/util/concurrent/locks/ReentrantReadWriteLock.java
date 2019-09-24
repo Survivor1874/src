@@ -285,6 +285,7 @@ public class ReentrantReadWriteLock
          */
         static final class ThreadLocalHoldCounter
             extends ThreadLocal<HoldCounter> {
+            @Override
             public HoldCounter initialValue() {
                 return new HoldCounter();
             }

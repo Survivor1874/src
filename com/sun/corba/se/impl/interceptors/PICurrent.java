@@ -61,6 +61,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
     // for resolve_initial_references( "PICurrent" );
     private ThreadLocal threadLocalSlotTable
         = new ThreadLocal( ) {
+            @Override
             protected Object initialValue( ) {
                 SlotTable table = new SlotTable( myORB, slotCounter );
                 return new SlotTableStack( myORB, table );
